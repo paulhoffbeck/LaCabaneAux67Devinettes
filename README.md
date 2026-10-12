@@ -53,8 +53,10 @@ quiz-clash/
         ├── services/
         │   └── socketClient.js # Fichier centralisant la connexion Socket.io vers le backend
         ├── views/             # Les écrans principaux
-        │   ├── HostView.vue   # L'écran principal "Télé" (affiche le code, la question, le chrono)
-        │   └── PlayerView.vue # L'écran "Manette" sur smartphone (boutons de couleurs)
+        │   ├── HostView.vue   # Partie perso : réglages, code à partager, salle d'attente
+        │   ├── PlayerView.vue # L'écran de jeu (question, réponses, chrono, correction)
+        │   ├── ProposeView.vue # Proposer une question (une par jour)
+        │   └── AdminView.vue  # Espace admin : valider, modifier ou refuser les propositions
         ├── components/        # Composants Vue réutilisables
         │   ├── ScoreBoard.vue # Tableau des scores
         │   └── PlayerBadge.vue # Petit macaron pour afficher un joueur
