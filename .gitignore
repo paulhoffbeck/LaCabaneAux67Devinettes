@@ -1,0 +1,16 @@
+# Dépendances (seront installées sur le VPS via npm install)
+node_modules/
+
+# Variables d'environnement (secrets, clés API)
+.env
+.env.local
+
+# Fichiers générés par le build Vite/Vue
+frontend/dist/
+
+# Base de données SQLite locale (générée par Prisma)
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# Logs npm
+*.log
