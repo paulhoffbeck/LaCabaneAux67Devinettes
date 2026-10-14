@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { listThemes, dailyStatus, dailyLeaderboard } from './services/socketClient.js'
+import { api } from './services/socketClient.js'
 import PlayerView from './views/PlayerView.vue'
 import HostView from './views/HostView.vue'
 import ProposeView from './views/ProposeView.vue'
@@ -44,8 +44,8 @@ const today = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric'
 async function refreshDaily() {
   try {
     const [board, status] = await Promise.all([
-      dailyLeaderboard(),
-      cleanNickname.value ? dailyStatus(cleanNickname.value) : Promise.resolve(null),
+      api.daily.getLeaderboard(),
+      cleanNickname.value ? api.daily.getStatus(cleanNickname.value) : Promise.resolve(null),
     ])
     leaderboard.value = board.entries
     daily.value = status
@@ -57,7 +57,8 @@ async function refreshDaily() {
 async function loadHome() {
   error.value = ''
   try {
-    themes.value = (await listThemes()).themes
+    const response = await api.themes.list()
+    themes.value = response.themes
   } catch (e) {
     error.value = `Impossible de joindre le serveur (${e.message}).`
   }

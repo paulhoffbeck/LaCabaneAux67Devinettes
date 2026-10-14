@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// Balises gérées par Lit, que Vue ne doit pas essayer de résoudre comme composants
 const CUSTOM_ELEMENTS = ['timer-gauge', 'jcb-gauge']
 
 export default defineConfig({
@@ -15,8 +14,13 @@ export default defineConfig({
     }),
   ],
   server: {
-    // Accessible depuis les téléphones du réseau local (http://<ip-du-pc>:5173)
     host: true,
     port: 5173,
+    proxy: {
+      '/socket.io': {
+        target: 'http://localhost:3000',
+        ws: true,
+      },
+    },
   },
 })

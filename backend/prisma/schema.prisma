@@ -1,0 +1,23 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Theme {
+  id        Int        @id @default(autoincrement())
+  name      String
+  questions Question[]
+}
+
+model Question {
+  id          Int    @id @default(autoincrement())
+  text        String
+  choices     String
+  answerIndex Int
+  themeId     Int?
+  theme       Theme? @relation(fields: [themeId], references: [id])
+}
