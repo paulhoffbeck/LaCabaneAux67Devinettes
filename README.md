@@ -1,64 +1,72 @@
-# 🎮 Quiz Clash - Projet Web Temps Réel
+# Quiz Clash
 
-Jeu de quiz multijoueur interactif où un écran principal (la "télé") affiche les questions, et les joueurs utilisent leurs smartphones comme manettes pour répondre le plus vite possible.
+Petit jeu de quiz de culture générale dans le navigateur. On choisit un pseudo, puis on peut :
 
-## 🛠️ Stack Technique
+- jouer le **quiz du jour** (10 questions, une partie par jour, classement du jour) ;
+- lancer un **quiz à thème** ;
+- créer une **partie perso** avec un code à 4 lettres pour jouer en direct avec des amis ;
+- **proposer une question** (une par jour), qu'un admin relit, corrige puis valide ou refuse.
 
-Ce projet est construit avec les technologies et modules suivants :
+Le front est en Vue 3 (Vite), le back en Node/Express avec Socket.io. Toute la communication passe par Socket.io (pas d'API REST) : le client envoie un événement et attend la réponse dans un callback.
 
-**Frontend (Client) :**
-*   **Vite :** Outil de build ultra-rapide pour le développement.
-*   **Vue.js :** Framework JavaScript réactif pour gérer l'affichage conditionnel (Lobby, Questions, Scores).
-*   **Lit / LitElement :** Création de Web Components natifs.
-*   **jcb-gauge :** Composant web (jauge) utilisé pour afficher le chronomètre de manière visuelle.
+## Lancer le projet
 
-**Backend (Serveur) :**
-*   **Node.js & Express :** Serveur web pour gérer les requêtes et héberger l'API.
-*   **Prisma :** ORM (Object-Relational Mapping) pour simplifier les requêtes vers la base de données.
-*   **SQL (SQLite ou PostgreSQL) :** Base de données relationnelle pour stocker les questions et les scores.
+Il faut Node.js (une version récente, Vite 8 en demande une à jour).
 
-**Communication :**
-*   **WebSockets (Socket.io) :** Synchronisation bidirectionnelle en temps réel entre le serveur, l'écran principal et les manettes des joueurs.
+**Backend** (port 3000) :
 
----
+```bash
+cd backend
+npm install
+npx prisma generate
+npx prisma db push   # crée prisma/dev.db (SQLite)
+npm run dev          # nodemon, ou npm start
+```
 
-## 📂 Architecture du Projet (Tree)
+Si Prisma n'est pas généré ou que la base n'est pas joignable, le serveur démarre quand même et utilise les données en dur.
 
-Voici comment le code est organisé. Le projet est divisé en deux parties principales : `backend` et `frontend`.
+**Frontend** (port 5173) :
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Vite redirige `/socket.io` vers `localhost:3000`, donc il faut que le back tourne en même temps. `host: true` est activé : l'appli est accessible depuis un téléphone sur le même réseau via l'IP de la machine.
+
+Le port du back se change avec la variable `PORT`.
+
+## Organisation
 
 ```text
-quiz-clash/
-│
-├── README.md                  # Documentation du projet
-│
-├── backend/                   # 🧠 LOGIQUE SERVEUR & BASE DE DONNÉES
-│   ├── package.json           # Dépendances Node (express, socket.io, prisma)
-│   ├── prisma/
-│   │   ├── schema.prisma      # Définition des tables SQL (Questions, Scores)
-│   │   └── dev.db             # Base de données SQLite (générée automatiquement)
-│   ├── src/
-│   │   ├── server.js          # Point d'entrée : lance Express et le serveur WebSocket
-│   │   ├── sockets.js         # Logique du jeu en temps réel (rooms, timers, scores)
-│   │   └── routes.js          # (Optionnel) API classique pour gérer la DB (CRUD questions)
-│   └── .env                   # Variables d'environnement (Port, URL de la DB)
-│
-└── frontend/                  # 🎨 INTERFACE UTILISATEUR & VUE.JS
-    ├── package.json           # Dépendances front (vue, vite, lit, jcb-gauge, socket.io-client)
-    ├── vite.config.js         # Configuration de Vite
-    ├── index.html             # Point d'entrée HTML
-    ├── public/                # Fichiers statiques (images, favicon, sons)
-    └── src/
-        ├── main.js            # Initialisation de Vue.js
-        ├── App.vue            # Composant racine Vue
-        ├── services/
-        │   └── socketClient.js # Fichier centralisant la connexion Socket.io vers le backend
-        ├── views/             # Les écrans principaux
-        │   ├── HostView.vue   # Partie perso : réglages, code à partager, salle d'attente
-        │   ├── PlayerView.vue # L'écran de jeu (question, réponses, chrono, correction)
-        │   ├── ProposeView.vue # Proposer une question (une par jour)
-        │   └── AdminView.vue  # Espace admin : valider, modifier ou refuser les propositions
-        ├── components/        # Composants Vue réutilisables
-        │   ├── ScoreBoard.vue # Tableau des scores
-        │   └── PlayerBadge.vue # Petit macaron pour afficher un joueur
-        └── web-components/    # Standard Web Components (Lit)
-            └── TimerGauge.js  # Wrapper personnalisé LitElement utilisant "jcb-gauge"
+backend/
+  src/server.js          serveur Express + tous les handlers Socket.io
+  prisma/schema.prisma   modèles Theme et Question (SQLite)
+
+frontend/
+  vite.config.js         proxy Socket.io, déclaration des custom elements
+  src/
+    App.vue              accueil + bascule entre les écrans (pas de routeur)
+    services/socketClient.js   connexion Socket.io et une fonction par événement
+    views/
+      PlayerView.vue     écran de jeu (solo et partie perso)
+      HostView.vue       création / connexion à une partie perso, salle d'attente
+      ProposeView.vue    formulaire de proposition (QCM ou réponse libre)
+      AdminView.vue      connexion admin et relecture des propositions
+    components/
+      ScoreBoard.vue, PlayerBadge.vue
+    web-components/
+      TimerGauge.js      <timer-gauge>, composant Lit qui affiche le chrono avec jcb-gauge
+```
+
+Quelques détails :
+
+- Le pseudo est gardé dans le `localStorage`, le jeton admin dans le `sessionStorage`.
+- `<timer-gauge>` passe du vert à l'orange sous 50 % du temps restant, puis au rouge sous 25 %, et émet un événement `timeout` à la fin.
+- `socketClient.js` logue tous les événements entrants et sortants dans la console.
+
+## Dépendances principales
+
+- Front : Vue 3, Vite, Lit, jcb-gauge, socket.io-client
+- Back : Express 5, Socket.io, Prisma (SQLite), cors
