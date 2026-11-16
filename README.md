@@ -10,6 +10,7 @@ Petit jeu de quiz de culture générale dans le navigateur. On choisit un pseudo
 - lancer un **quiz à thème** ;
 - créer une **partie perso** avec un code à 4 lettres pour jouer en direct avec des amis ;
 - **proposer une question** (une par jour), qu'un admin relit, corrige puis valide ou refuse.
+- Identifiant admin : admin/admin (cet identifiant donne uniquement accès à l'acceptation des questions. Il n'a aucun droit sur le site ou le serveur en lui même)
 
 Le front est en Vue 3 (Vite), le back en Node/Express avec Socket.io. Toute la communication passe par Socket.io (pas d'API REST) : le client envoie un événement et attend la réponse dans un callback.
 
