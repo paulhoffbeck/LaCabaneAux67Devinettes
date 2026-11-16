@@ -1,5 +1,9 @@
 # Quiz Clash
+**Accéder au Quizz**
+Pour accéder au site du quizz, entrer cette ip dans un navigateur : 
+http://179.237.127.236/
 
+**Présentation**
 Petit jeu de quiz de culture générale dans le navigateur. On choisit un pseudo, puis on peut :
 
 - jouer le **quiz du jour** (10 questions, une partie par jour, classement du jour) ;
