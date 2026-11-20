@@ -1,123 +1,91 @@
-// backend/src/server.js
-const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
-const cors = require('cors');
+// Point d'entrée : lance Express (site + API) et le serveur WebSocket (socket.io).
+import http from 'node:http'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import express from 'express'
+import { Server } from 'socket.io'
+import { PrismaClient } from '@prisma/client'
+import { createRoutes } from './routes.js'
+import { registerSockets } from './sockets.js'
 
-// Import Prisma sécurisé : ne fait JAMAIS planter Node si Prisma n'est pas généré
-let prisma = null;
-try {
-  const { PrismaClient } = require('@prisma/client');
-  prisma = new PrismaClient();
-  console.log('[Prisma] Client chargé');
-} catch (e) {
-  console.warn('[Prisma] BDD non disponible, exécution en mode mémoire');
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const BACKEND_DIR = path.join(__dirname, '..')
+
+const PORT = Number(process.env.PORT ?? 3000)
+// En dev, 0.0.0.0 pour que les téléphones du réseau local puissent se connecter.
+// En production derrière nginx, mettre HOST=127.0.0.1 dans .env.
+const HOST = process.env.HOST ?? '0.0.0.0'
+const IS_PROD = process.env.NODE_ENV === 'production'
+const FRONT_DIST = path.resolve(BACKEND_DIR, process.env.FRONT_DIST ?? '../frontend/dist')
+const QUESTIONS_FILE = path.resolve(BACKEND_DIR, process.env.QUESTIONS_FILE ?? 'prisma/questions.json')
+
+const prisma = new PrismaClient()
+
+// Au premier démarrage (base vide), on importe la banque de questions depuis questions.json :
+// { labels: [{ slug, name, isTheme }], questions: [{ type, labels: [slug], text, choices?, answerIndex?, acceptedAnswers? }] }
+async function importQuestionsIfEmpty() {
+  if ((await prisma.question.count()) > 0) return
+  if (!fs.existsSync(QUESTIONS_FILE)) {
+    console.warn(`Base vide et ${QUESTIONS_FILE} introuvable : aucune question importée.`)
+    return
+  }
+  const data = JSON.parse(fs.readFileSync(QUESTIONS_FILE, 'utf8'))
+  for (const l of data.labels ?? []) {
+    await prisma.label.upsert({
+      where: { slug: l.slug },
+      update: { name: l.name, isTheme: l.isTheme ?? true },
+      create: { slug: l.slug, name: l.name, isTheme: l.isTheme ?? true },
+    })
+  }
+  let count = 0
+  for (const q of data.questions ?? []) {
+    await prisma.question.create({
+      data: {
+        type: q.type,
+        text: q.text,
+        choices: q.type === 'choice' ? JSON.stringify(q.choices) : null,
+        answerIndex: q.type === 'choice' ? q.answerIndex : null,
+        acceptedAnswers: q.type === 'text' ? JSON.stringify(q.acceptedAnswers) : null,
+        labels: { connect: (q.labels ?? []).map((slug) => ({ slug })) },
+      },
+    })
+    count++
+  }
+  console.log(`${count} questions importées depuis ${QUESTIONS_FILE}`)
 }
 
-const app = express();
-app.use(cors());
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const app = express()
+const server = http.createServer(app)
+const io = new Server(server, {
+  // En dev, le front tourne sur un autre port (Vite, 5173) : on l'autorise.
+  // En production, le front est servi ici même : même origine, pas besoin de CORS.
+  cors: IS_PROD ? undefined : { origin: true },
+})
 
-const soloSessions = new Map();
+app.disable('x-powered-by')
+app.use(express.json())
+app.use('/api', createRoutes(prisma))
 
-io.on('connection', (socket) => {
-  console.log('[Backend] Joueur connecté :', socket.id);
+// Le front compilé (npm run build dans frontend/)
+if (fs.existsSync(FRONT_DIST)) {
+  app.use(express.static(FRONT_DIST))
+} else {
+  console.warn(`${FRONT_DIST} introuvable : lance "npm run build" dans frontend/ pour servir le site.`)
+}
 
-  // 1. Thèmes
-  socket.on('themes:list', async (payload, callback) => {
-    let themes = [];
-    if (prisma) {
-      try {
-        const dbThemes = await prisma.theme.findMany({
-          include: { _count: { select: { questions: true } } }
-        });
-        themes = dbThemes.map(t => ({
-          id: String(t.id),
-          name: t.name,
-          questionCount: t._count.questions
-        }));
-      } catch (e) { console.error(e.message); }
-    }
+registerSockets(io, prisma)
 
-    if (!themes.length) {
-      themes = [
-        { id: '1', name: 'Culture Générale', questionCount: 10 },
-        { id: '2', name: 'Histoire & Géographie', questionCount: 10 }
-      ];
-    }
-    callback?.({ ok: true, themes });
-  });
+await importQuestionsIfEmpty()
+server.listen(PORT, HOST, () => {
+  console.log(`Quiz Clash en écoute sur http://${HOST}:${PORT}`)
+})
 
-  // 2. Solo Start
-  socket.on('solo:start', async ({ mode, themeId, nickname }, callback) => {
-    let questions = [];
-    if (prisma) {
-      try {
-        questions = await prisma.question.findMany({ take: 10 });
-      } catch (e) { console.error(e.message); }
-    }
-
-    if (!questions.length) {
-      questions = [
-        { id: 1, text: 'Quelle est la capitale de la France ?', choices: JSON.stringify(['Paris', 'Lyon', 'Marseille', 'Bordeaux']), answerIndex: 0 },
-        { id: 2, text: 'Combien font 7 x 8 ?', choices: JSON.stringify(['54', '56', '62', '64']), answerIndex: 1 }
-      ];
-    }
-
-    const sessionId = 'session_' + Date.now();
-    soloSessions.set(sessionId, { nickname, questions, currentIndex: 0, score: 0 });
-    callback?.({ ok: true, sessionId });
-  });
-
-  // 3. Solo Next
-  socket.on('solo:next', async ({ sessionId }, callback) => {
-    const session = soloSessions.get(sessionId);
-    if (!session) return callback?.({ ok: false, error: 'SESSION_NOT_FOUND' });
-
-    const q = session.questions[session.currentIndex];
-    if (!q) {
-      return callback?.({ ok: true, done: true, score: session.score, total: session.questions.length });
-    }
-
-    let choices = [];
-    try { choices = typeof q.choices === 'string' ? JSON.parse(q.choices) : q.choices; }
-    catch (e) { choices = ['Option A', 'Option B', 'Option C', 'Option D']; }
-
-    callback?.({
-      ok: true,
-      question: {
-        id: q.id,
-        text: q.text,
-        choices,
-        type: 'qcm',
-        durationMs: 15000,
-        totalQuestions: session.questions.length,
-        currentIndex: session.currentIndex + 1
-      }
-    });
-  });
-
-  // 4. Solo Answer
-  socket.on('solo:answer', async ({ sessionId, questionId, answer }, callback) => {
-    const session = soloSessions.get(sessionId);
-    if (!session) return callback?.({ ok: false, error: 'SESSION_NOT_FOUND' });
-
-    const q = session.questions[session.currentIndex];
-    const isCorrect = String(q.answerIndex) === String(answer);
-
-    if (isCorrect) session.score += 10;
-    session.currentIndex += 1;
-
-    callback?.({ ok: true, correct: isCorrect, correctAnswer: q.answerIndex, currentScore: session.score });
-  });
-
-  socket.on('daily:status', (d, cb) => cb?.({ ok: true, status: { played: false, score: 0 } }));
-  socket.on('daily:leaderboard', (d, cb) => cb?.({ ok: true, entries: [] }));
-  socket.on('disconnect', () => console.log('[Backend] Déconnexion :', socket.id));
-});
-
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Serveur Backend prêt sur le port ${PORT}`);
-});
+// Arrêt propre (systemctl stop / Ctrl+C)
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, async () => {
+    io.close()
+    await prisma.$disconnect()
+    process.exit(0)
+  })
+}

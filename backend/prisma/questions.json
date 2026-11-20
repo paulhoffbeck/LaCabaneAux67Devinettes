@@ -1,0 +1,1130 @@
+{
+  "labels": [
+    {
+      "slug": "histoire",
+      "name": "Histoire",
+      "isTheme": true
+    },
+    {
+      "slug": "geo",
+      "name": "Géographie",
+      "isTheme": true
+    },
+    {
+      "slug": "sciences",
+      "name": "Sciences",
+      "isTheme": true
+    },
+    {
+      "slug": "cinema",
+      "name": "Cinéma",
+      "isTheme": true
+    },
+    {
+      "slug": "sport",
+      "name": "Sport",
+      "isTheme": true
+    },
+    {
+      "slug": "arts",
+      "name": "Arts et lettres",
+      "isTheme": true
+    }
+  ],
+  "questions": [
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "En quelle année a eu lieu la prise de la Bastille ?",
+      "choices": [
+        "1769",
+        "1789",
+        "1799",
+        "1815"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quel empereur français a été exilé sur l'île de Sainte-Hélène ?",
+      "acceptedAnswers": [
+        "Napoléon",
+        "Napoléon Ier",
+        "Napoléon Bonaparte",
+        "Bonaparte"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quelle civilisation a construit le Machu Picchu ?",
+      "choices": [
+        "Les Aztèques",
+        "Les Mayas",
+        "Les Incas",
+        "Les Olmèques"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "En quelle année le mur de Berlin est-il tombé ?",
+      "choices": [
+        "1987",
+        "1989",
+        "1991",
+        "1993"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quelle reine d'Égypte antique est célèbre pour sa liaison avec Marc Antoine ?",
+      "acceptedAnswers": [
+        "Cléopâtre",
+        "Cléopâtre VII"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Qui était le premier président de la Ve République ?",
+      "choices": [
+        "Georges Pompidou",
+        "Charles de Gaulle",
+        "Vincent Auriol",
+        "René Coty"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quelle est la capitale de l'Australie ?",
+      "choices": [
+        "Sydney",
+        "Melbourne",
+        "Canberra",
+        "Perth"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quel est le plus long fleuve de France ?",
+      "acceptedAnswers": [
+        "Loire",
+        "La Loire"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Dans quel pays se trouve le mont Kilimandjaro ?",
+      "choices": [
+        "Kenya",
+        "Tanzanie",
+        "Ouganda",
+        "Éthiopie"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quel océan borde la côte ouest de l'Afrique ?",
+      "choices": [
+        "Océan Indien",
+        "Océan Pacifique",
+        "Océan Atlantique",
+        "Océan Arctique"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quelle est la capitale du Canada ?",
+      "acceptedAnswers": [
+        "Ottawa"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Combien de pays ont une frontière terrestre avec la France métropolitaine ?",
+      "choices": [
+        "6",
+        "7",
+        "8",
+        "9"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quel est le symbole chimique de l'or ?",
+      "choices": [
+        "Ag",
+        "Au",
+        "Or",
+        "Go"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quelle planète est surnommée la planète rouge ?",
+      "acceptedAnswers": [
+        "Mars"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Combien d'os compte le corps humain adulte ?",
+      "choices": [
+        "186",
+        "206",
+        "226",
+        "246"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quelle est la vitesse approximative de la lumière dans le vide ?",
+      "choices": [
+        "300 000 km/s",
+        "150 000 km/s",
+        "30 000 km/s",
+        "3 000 000 km/s"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quel gaz les plantes absorbent-elles pour la photosynthèse ?",
+      "acceptedAnswers": [
+        "Dioxyde de carbone",
+        "CO2",
+        "Gaz carbonique"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Qui a formulé la théorie de la relativité ?",
+      "choices": [
+        "Isaac Newton",
+        "Niels Bohr",
+        "Albert Einstein",
+        "Max Planck"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Qui a réalisé le film « Le Fabuleux Destin d'Amélie Poulain » ?",
+      "choices": [
+        "Luc Besson",
+        "Jean-Pierre Jeunet",
+        "Jacques Audiard",
+        "Michel Gondry"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Dans « Star Wars », comment s'appelle le père de Luke Skywalker ?",
+      "acceptedAnswers": [
+        "Dark Vador",
+        "Anakin Skywalker",
+        "Anakin",
+        "Darth Vader",
+        "Vador"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Quel film a remporté l'Oscar du meilleur film en 1998 ?",
+      "choices": [
+        "Titanic",
+        "Good Will Hunting",
+        "L.A. Confidential",
+        "Pour le pire et pour le meilleur"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Dans quelle ville se déroule le festival de cinéma qui décerne la Palme d'or ?",
+      "choices": [
+        "Venise",
+        "Berlin",
+        "Cannes",
+        "Deauville"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Quel studio d'animation a produit « Toy Story » ?",
+      "acceptedAnswers": [
+        "Pixar",
+        "Pixar Animation Studios"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Quel acteur incarne Jack Sparrow dans « Pirates des Caraïbes » ?",
+      "choices": [
+        "Orlando Bloom",
+        "Johnny Depp",
+        "Brad Pitt",
+        "Keanu Reeves"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Combien de joueurs une équipe de rugby à XV aligne-t-elle sur le terrain ?",
+      "choices": [
+        "11",
+        "13",
+        "15",
+        "18"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sport"
+      ],
+      "text": "Dans quel sport utilise-t-on un volant ?",
+      "acceptedAnswers": [
+        "Badminton"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Quel pays a remporté la Coupe du monde de football 2018 ?",
+      "choices": [
+        "Croatie",
+        "Brésil",
+        "France",
+        "Allemagne"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Quelle est la distance officielle d'un marathon ?",
+      "choices": [
+        "40 km",
+        "42,195 km",
+        "45 km",
+        "41,5 km"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sport"
+      ],
+      "text": "Quel tournoi de tennis se joue sur la terre battue de la porte d'Auteuil ?",
+      "acceptedAnswers": [
+        "Roland-Garros",
+        "Roland Garros",
+        "Internationaux de France"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Tous les combien d'années ont lieu les Jeux olympiques d'été ?",
+      "choices": [
+        "2 ans",
+        "3 ans",
+        "4 ans",
+        "5 ans"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Qui a peint « La Nuit étoilée » ?",
+      "choices": [
+        "Claude Monet",
+        "Vincent van Gogh",
+        "Paul Cézanne",
+        "Edgar Degas"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "arts"
+      ],
+      "text": "Qui a écrit « Les Misérables » ?",
+      "acceptedAnswers": [
+        "Victor Hugo",
+        "Hugo"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Dans quel musée est exposée « La Joconde » ?",
+      "choices": [
+        "Musée d'Orsay",
+        "Musée du Louvre",
+        "Centre Pompidou",
+        "Musée Rodin"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Quel compositeur a écrit « Les Quatre Saisons » ?",
+      "choices": [
+        "Bach",
+        "Mozart",
+        "Vivaldi",
+        "Beethoven"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "arts"
+      ],
+      "text": "Quel auteur a créé le personnage du Petit Prince ?",
+      "acceptedAnswers": [
+        "Antoine de Saint-Exupéry",
+        "Saint-Exupéry",
+        "Saint Exupéry"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Quel sculpteur a réalisé « Le Penseur » ?",
+      "choices": [
+        "Auguste Rodin",
+        "Camille Claudel",
+        "Michel-Ange",
+        "Aristide Maillol"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quel roi de France était surnommé le Roi-Soleil ?",
+      "choices": [
+        "Louis XIII",
+        "Louis XIV",
+        "Louis XV",
+        "Louis XVI"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quelle bergère lorraine a mené les troupes françaises lors de la guerre de Cent Ans ?",
+      "acceptedAnswers": [
+        "Jeanne d'Arc",
+        "Jeanne"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "En quelle année Christophe Colomb a-t-il atteint l'Amérique ?",
+      "choices": [
+        "1453",
+        "1492",
+        "1515",
+        "1534"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quel événement a lieu le 6 juin 1944 ?",
+      "choices": [
+        "L'armistice",
+        "Le débarquement en Normandie",
+        "La libération de Paris",
+        "La bataille de Verdun"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quelle ville était la capitale de l'Empire romain d'Orient ?",
+      "acceptedAnswers": [
+        "Constantinople",
+        "Byzance"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Qui a été le premier homme à marcher sur la Lune ?",
+      "choices": [
+        "Buzz Aldrin",
+        "Youri Gagarine",
+        "Neil Armstrong",
+        "Michael Collins"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire",
+        "sciences"
+      ],
+      "text": "En quelle année l'homme a-t-il marché sur la Lune pour la première fois ?",
+      "choices": [
+        "1965",
+        "1969",
+        "1972",
+        "1975"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "histoire"
+      ],
+      "text": "Quel traité a mis fin à la Première Guerre mondiale avec l'Allemagne ?",
+      "choices": [
+        "Traité de Versailles",
+        "Traité de Rome",
+        "Traité de Paris",
+        "Traité de Vienne"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quel est le plus grand désert chaud du monde ?",
+      "choices": [
+        "Gobi",
+        "Kalahari",
+        "Sahara",
+        "Atacama"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quelle est la capitale du Japon ?",
+      "acceptedAnswers": [
+        "Tokyo",
+        "Tōkyō"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quel est le plus haut sommet des Alpes ?",
+      "choices": [
+        "Le Cervin",
+        "Le mont Blanc",
+        "Le mont Rose",
+        "La Barre des Écrins"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quel pays compte le plus d'habitants en 2024 ?",
+      "choices": [
+        "Chine",
+        "Inde",
+        "États-Unis",
+        "Indonésie"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quel détroit sépare l'Espagne du Maroc ?",
+      "acceptedAnswers": [
+        "Gibraltar",
+        "Détroit de Gibraltar"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Sur quel continent se trouve le Pérou ?",
+      "choices": [
+        "Afrique",
+        "Amérique du Sud",
+        "Asie",
+        "Océanie"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quelle mer borde la ville de Marseille ?",
+      "choices": [
+        "La mer du Nord",
+        "La Manche",
+        "La mer Méditerranée",
+        "La mer Noire"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "geo"
+      ],
+      "text": "Quel est le plus grand océan du monde ?",
+      "acceptedAnswers": [
+        "Pacifique",
+        "Océan Pacifique"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quelle est la formule chimique de l'eau ?",
+      "choices": [
+        "CO2",
+        "H2O",
+        "O2",
+        "NaCl"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quelle est la planète la plus proche du Soleil ?",
+      "acceptedAnswers": [
+        "Mercure"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Combien de chromosomes possède une cellule humaine normale ?",
+      "choices": [
+        "23",
+        "44",
+        "46",
+        "48"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "À quelle température l'eau bout-elle au niveau de la mer ?",
+      "choices": [
+        "90 °C",
+        "100 °C",
+        "110 °C",
+        "120 °C"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quel organe pompe le sang dans le corps humain ?",
+      "acceptedAnswers": [
+        "Cœur",
+        "Coeur",
+        "Le cœur"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quelle particule porte une charge électrique négative ?",
+      "choices": [
+        "Le proton",
+        "Le neutron",
+        "L'électron",
+        "Le photon"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sciences",
+        "histoire"
+      ],
+      "text": "Qui a découvert la pénicilline en 1928 ?",
+      "choices": [
+        "Louis Pasteur",
+        "Alexander Fleming",
+        "Marie Curie",
+        "Robert Koch"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sciences"
+      ],
+      "text": "Quelle est la plus grande planète du Système solaire ?",
+      "acceptedAnswers": [
+        "Jupiter"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Qui a réalisé « Les Dents de la mer » ?",
+      "choices": [
+        "George Lucas",
+        "Steven Spielberg",
+        "Martin Scorsese",
+        "Francis Ford Coppola"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Comment s'appelle le sorcier à lunettes créé par J. K. Rowling ?",
+      "acceptedAnswers": [
+        "Harry Potter",
+        "Harry"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Dans quel film entend-on « Je suis ton père » ?",
+      "choices": [
+        "Star Trek",
+        "L'Empire contre-attaque",
+        "Le Retour du Jedi",
+        "Un nouvel espoir"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Quel acteur joue le rôle principal dans « Intouchables » aux côtés de François Cluzet ?",
+      "choices": [
+        "Jamel Debbouze",
+        "Omar Sy",
+        "Gad Elmaleh",
+        "Kad Merad"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Quel est le nom du lion dans « Le Roi lion » ?",
+      "acceptedAnswers": [
+        "Simba"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Quel réalisateur a signé « Pulp Fiction » ?",
+      "choices": [
+        "Quentin Tarantino",
+        "David Fincher",
+        "Christopher Nolan",
+        "Guy Ritchie"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Comment s'appelle la récompense du cinéma français équivalente aux Oscars ?",
+      "choices": [
+        "Les Victoires",
+        "Les Molières",
+        "Les César",
+        "Les Lumières d'or"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "cinema"
+      ],
+      "text": "Quel personnage de Disney perd sa pantoufle de verre ?",
+      "acceptedAnswers": [
+        "Cendrillon"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Combien de joueurs une équipe de football aligne-t-elle sur le terrain ?",
+      "choices": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sport"
+      ],
+      "text": "De quelle couleur est le maillot du leader du Tour de France ?",
+      "acceptedAnswers": [
+        "Jaune",
+        "Maillot jaune"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Dans quel sport s'illustre Teddy Riner ?",
+      "choices": [
+        "Boxe",
+        "Lutte",
+        "Judo",
+        "Haltérophilie"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Combien de points vaut un essai au rugby à XV ?",
+      "choices": [
+        "3",
+        "4",
+        "5",
+        "7"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sport",
+        "histoire"
+      ],
+      "text": "Quelle ville a accueilli les Jeux olympiques d'été de 2024 ?",
+      "acceptedAnswers": [
+        "Paris"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Quel nageur américain détient le record de médailles d'or olympiques ?",
+      "choices": [
+        "Ryan Lochte",
+        "Mark Spitz",
+        "Michael Phelps",
+        "Caeleb Dressel"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "sport"
+      ],
+      "text": "Au basket, combien de points vaut un tir derrière la ligne à trois points ?",
+      "choices": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "text",
+      "labels": [
+        "sport"
+      ],
+      "text": "Dans quel sport pratique-t-on le smash, le revers et le lob, avec une raquette et un filet sur un court ?",
+      "acceptedAnswers": [
+        "Tennis"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Qui a écrit « Le Rouge et le Noir » ?",
+      "choices": [
+        "Balzac",
+        "Stendhal",
+        "Flaubert",
+        "Zola"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "arts"
+      ],
+      "text": "Quel peintre espagnol a peint « Guernica » ?",
+      "acceptedAnswers": [
+        "Picasso",
+        "Pablo Picasso"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Quel dramaturge a écrit « Le Malade imaginaire » ?",
+      "choices": [
+        "Racine",
+        "Corneille",
+        "Molière",
+        "Marivaux"
+      ],
+      "answerIndex": 2
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Quel mouvement artistique Claude Monet a-t-il contribué à fonder ?",
+      "choices": [
+        "Le cubisme",
+        "L'impressionnisme",
+        "Le surréalisme",
+        "Le fauvisme"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "arts"
+      ],
+      "text": "Qui a écrit « Roméo et Juliette » ?",
+      "acceptedAnswers": [
+        "Shakespeare",
+        "William Shakespeare"
+      ]
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Qui a composé « La Flûte enchantée » ?",
+      "choices": [
+        "Mozart",
+        "Verdi",
+        "Wagner",
+        "Haydn"
+      ],
+      "answerIndex": 0
+    },
+    {
+      "type": "choice",
+      "labels": [
+        "arts"
+      ],
+      "text": "Quel auteur a écrit « Vingt Mille Lieues sous les mers » ?",
+      "choices": [
+        "Alexandre Dumas",
+        "Jules Verne",
+        "Victor Hugo",
+        "Guy de Maupassant"
+      ],
+      "answerIndex": 1
+    },
+    {
+      "type": "text",
+      "labels": [
+        "arts",
+        "histoire"
+      ],
+      "text": "Quel artiste de la Renaissance a peint la voûte de la chapelle Sixtine ?",
+      "acceptedAnswers": [
+        "Michel-Ange",
+        "Michelangelo",
+        "Michel Ange"
+      ]
+    }
+  ]
+}

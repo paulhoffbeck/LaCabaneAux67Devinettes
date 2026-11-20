@@ -1,23 +1,77 @@
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
-}
+// Base de données de Quiz Clash.
+// SQLite par défaut (un simple fichier dev.db). Pour PostgreSQL : provider = "postgresql"
+// et DATABASE_URL="postgresql://user:motdepasse@localhost:5432/quizclash" dans .env.
+//
+// Les listes (réponses d'un QCM, réponses acceptées, questions du jour) sont stockées
+// en texte JSON : ça marche à l'identique sur SQLite et PostgreSQL.
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Theme {
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Étiquette de thème ("histoire", "geo"…). isTheme = proposée comme quiz à thème sur l'accueil.
+model Label {
   id        Int        @id @default(autoincrement())
+  slug      String     @unique
   name      String
+  isTheme   Boolean    @default(true)
   questions Question[]
+  proposals Proposal[]
 }
 
 model Question {
-  id          Int    @id @default(autoincrement())
-  text        String
-  choices     String
-  answerIndex Int
-  themeId     Int?
-  theme       Theme? @relation(fields: [themeId], references: [id])
+  id              Int      @id @default(autoincrement())
+  type            String // "choice" (QCM à 4 réponses) | "text" (réponse libre)
+  text            String
+  choices         String? // JSON : ["A", "B", "C", "D"]
+  answerIndex     Int? // QCM : index de la bonne réponse (0-3)
+  acceptedAnswers String? // JSON : ["Napoléon", "Bonaparte"]
+  labels          Label[]
+  createdAt       DateTime @default(now())
+}
+
+// Les 10 questions du quiz du jour, tirées une fois pour toute la journée
+model DailyQuiz {
+  date        String @id // "2026-10-22" (fuseau Europe/Paris)
+  questionIds String // JSON : [12, 4, 57, …]
+}
+
+// Score du quiz du jour : une ligne par pseudo et par jour
+model Score {
+  id         Int       @id @default(autoincrement())
+  nickname   String
+  date       String
+  score      Int       @default(0)
+  createdAt  DateTime  @default(now())
+  finishedAt DateTime? // vide tant que le quiz n'est pas terminé
+
+  @@unique([nickname, date])
+  @@index([date, score])
+}
+
+// Question proposée par un joueur, relue par un admin
+model Proposal {
+  id              Int       @id @default(autoincrement())
+  nickname        String
+  date            String // jour de la proposition (limite : une par jour)
+  type            String
+  text            String
+  choices         String?
+  answerIndex     Int?
+  acceptedAnswers String?
+  labels          Label[]
+  status          String    @default("pending") // "pending" | "approved" | "rejected"
+  rejectReason    String?
+  reviewedBy      String?
+  questionId      Int? // question créée à la validation
+  createdAt       DateTime  @default(now())
+  reviewedAt      DateTime?
+
+  @@index([nickname, date])
+  @@index([status])
 }
