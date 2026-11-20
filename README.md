@@ -75,3 +75,7 @@ Quelques détails :
 
 - Front : Vue 3, Vite, Lit, jcb-gauge, socket.io-client
 - Back : Express 5, Socket.io, Prisma (SQLite), cors
+
+
+## Note sur le Github
+Ce github ne contient que la version de base. Il ne contient pas les questions ajoutées par les utilisateurs sur le serveur. 
