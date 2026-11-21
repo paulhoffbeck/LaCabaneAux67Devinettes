@@ -1,32 +1,25 @@
-// Logique du jeu en temps réel : quiz du jour, quiz à thème, parties perso (rooms),
-// propositions de questions et espace admin. Tout passe par socket.io.
-//
-// Chaque événement envoyé par le front attend un accusé de réception :
-// { ok: true, ... } ou { ok: false, error: 'CODE' } (voir frontend/src/services/socketClient.js).
 import crypto from 'node:crypto'
 
-const QUIZ_LENGTH = 10 // questions par quiz du jour / quiz à thème
-const SOLO_DURATION_MS = 20_000 // temps par question en solo
-const GRACE_MS = 1500 // marge pour la latence réseau avant de refuser une réponse
-const ROOM_NEXT_DELAY_MS = 1500 // pause quand tout le monde a répondu, avant la question suivante
+const QUIZ_LENGTH = 10 // nb de questions en solo (quiz du jour et thèmes)
+const SOLO_DURATION_MS = 20_000 // 20 s par question en solo
+const GRACE_MS = 1500 // petite marge pour la latence, sinon on refuse des réponses envoyées à temps
+const ROOM_NEXT_DELAY_MS = 1500 // quand tout le monde a répondu, on attend 1,5 s avant la suivante
 const ROOM_MAX_PLAYERS = 50
 const ROOM_COUNTS = [5, 10, 15]
 const ROOM_DURATIONS = [10, 20, 30]
-const ROOM_CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ' // sans I ni O, trop proches de 1 et 0
+const ROOM_CODE_LETTERS = 'ABCDEFGHJKLMNPQRSTUVWXYZ' // pas de I ni de O, on les confond trop avec 1 et 0
 const ADMIN_TOKEN_TTL_MS = 12 * 60 * 60 * 1000
 const LOGIN_MAX_FAILURES = 10
 const LOGIN_WINDOW_MS = 15 * 60 * 1000
 const TIME_ZONE = process.env.QUIZ_TIME_ZONE ?? 'Europe/Paris'
 
-// Erreur « métier » renvoyée telle quelle au front (son code est affiché par les vues)
+// erreurs "normales" du jeu, le code part direct au front qui affiche le bon message
 class GameError extends Error {}
 const fail = (code) => {
   throw new GameError(code)
 }
 
-// --- Petits outils ---------------------------------------------------------
-
-// Date du jour au format AAAA-MM-JJ, dans le fuseau du quiz (le quiz du jour change à minuit, heure de Paris)
+// date au format AAAA-MM-JJ, le quiz du jour change à minuit (heure de Paris)
 function today() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE }).format(new Date())
 }
@@ -52,7 +45,6 @@ function cleanNickname(value) {
 
 const parseList = (json) => (json ? JSON.parse(json) : [])
 
-// Ligne Prisma → question utilisable par le jeu
 function toQuestion(row) {
   return {
     id: row.id,
@@ -65,7 +57,7 @@ function toQuestion(row) {
   }
 }
 
-// Ce que voit le joueur : jamais la bonne réponse
+// ce qu'on envoie au joueur, donc évidemment sans la réponse
 function publicQuestion(q, index, total, durationMs) {
   const theme = q.labels.find((l) => l.isTheme) ?? q.labels[0]
   return {
@@ -80,7 +72,7 @@ function publicQuestion(q, index, total, durationMs) {
   }
 }
 
-// Comparaison tolérante des réponses libres : sans accents, majuscules, ponctuation ni article
+// pour comparer les réponses libres : on vire accents, majuscules, ponctuation et articles
 function normalize(text) {
   return text
     .toLowerCase()
@@ -107,7 +99,7 @@ function levenshtein(a, b) {
   return row[b.length]
 }
 
-// Accepte une faute de frappe sur les mots assez longs, jamais sur les nombres
+// on laisse passer une faute de frappe si le mot est assez long, mais pas pour les nombres
 function textMatches(answer, accepted) {
   const a = normalize(answer)
   if (!a) return false
@@ -119,7 +111,6 @@ function textMatches(answer, accepted) {
   })
 }
 
-// Réponse reçue → valeur propre (index 0-3, texte, ou null = pas de réponse)
 function cleanAnswer(q, answer) {
   if (q.type === 'choice') return Number.isInteger(answer) && answer >= 0 && answer < q.choices.length ? answer : null
   return typeof answer === 'string' && answer.trim() ? answer.trim().slice(0, 100) : null
@@ -130,21 +121,19 @@ function isCorrect(q, answer) {
   return q.type === 'choice' ? answer === q.answerIndex : textMatches(answer, q.acceptedAnswers)
 }
 
-// Bonne réponse : 500 points, plus jusqu'à 500 points de bonus de rapidité
+// 500 pts pour une bonne réponse, + jusqu'à 500 si on répond vite
 function pointsFor(correct, elapsedMs, durationMs) {
   if (!correct) return 0
   const speed = Math.max(0, 1 - elapsedMs / durationMs)
   return Math.round((500 + 500 * speed) / 10) * 10
 }
 
-// Une réponse enregistrée : { answer, correct, points }
 function scoreAnswer(q, rawAnswer, elapsedMs, durationMs) {
   const answer = elapsedMs > durationMs + GRACE_MS ? null : cleanAnswer(q, rawAnswer)
   const correct = isCorrect(q, answer)
   return { answer, correct, points: pointsFor(correct, elapsedMs, durationMs) }
 }
 
-// Correction de fin de partie : ma réponse à côté de la bonne
 function buildRecap(questions, answers) {
   return questions.map((q, i) => {
     const a = answers[i] ?? { answer: null, correct: false, points: 0 }
@@ -163,8 +152,7 @@ function buildRecap(questions, answers) {
 
 const totalScore = (answers) => answers.reduce((sum, a) => sum + (a?.points ?? 0), 0)
 
-// Vérifie une question (proposition joueur ou correction admin) et la remet au propre.
-// Mêmes règles que le formulaire de ProposeView.vue.
+// mêmes règles que dans ProposeView.vue (à garder synchro)
 function validateQuestion(input) {
   const type = input.type
   const text = typeof input.text === 'string' ? input.text.trim() : ''
@@ -187,7 +175,6 @@ function validateQuestion(input) {
   return { type, text, labelIds, choices: [], answerIndex: null, acceptedAnswers }
 }
 
-// Champs Prisma communs à Question et Proposal
 function questionFields(q) {
   return {
     type: q.type,
@@ -198,16 +185,14 @@ function questionFields(q) {
   }
 }
 
-// --- Branchement sur socket.io ---------------------------------------------
-
 export function registerSockets(io, prisma) {
-  const soloSessions = new Map() // sessionId → partie solo en cours
-  const rooms = new Map() // code → partie perso
-  const adminTokens = new Map() // jeton → { name, expiresAt }
-  const loginFailures = new Map() // ip → { count, since }
-  const proposing = new Set() // "pseudo|date" en cours d'enregistrement (évite le double envoi)
+  const soloSessions = new Map()
+  const rooms = new Map()
+  const adminTokens = new Map()
+  const loginFailures = new Map()
+  const proposing = new Set() // pour éviter qu'un double clic envoie 2 propositions
 
-  // Comptes admin, dans .env : ADMINS="robin:motdepasse,alex:autremotdepasse"
+  // les comptes admin sont dans le .env : ADMINS="robin:motdepasse,alex:autremotdepasse"
   const admins = new Map(
     (process.env.ADMINS ?? '')
       .split(',')
@@ -221,8 +206,6 @@ export function registerSockets(io, prisma) {
   )
   if (!admins.size) console.warn('Aucun compte admin (variable ADMINS vide) : l\'espace admin est désactivé.')
 
-  // --- Accès aux questions ---
-
   const withLabels = { labels: true }
 
   async function questionsByIds(ids) {
@@ -231,14 +214,12 @@ export function registerSockets(io, prisma) {
     return ids.map((id) => byId.get(id)).filter(Boolean)
   }
 
-  // Tire `count` questions au hasard (toutes, ou celles d'un thème)
   async function randomQuestions(count, labelId = null) {
     const where = labelId ? { labels: { some: { id: labelId } } } : {}
     const ids = (await prisma.question.findMany({ where, select: { id: true } })).map((r) => r.id)
     return questionsByIds(shuffle(ids).slice(0, count))
   }
 
-  // Les questions du jour sont tirées une seule fois, puis gardées en base pour tout le monde
   async function dailyQuestions(date) {
     let quiz = await prisma.dailyQuiz.findUnique({ where: { date } })
     if (!quiz) {
@@ -246,7 +227,7 @@ export function registerSockets(io, prisma) {
       try {
         quiz = await prisma.dailyQuiz.create({ data: { date, questionIds: JSON.stringify(picked.map((q) => q.id)) } })
       } catch {
-        // Deux joueurs ont lancé le premier quiz du jour en même temps : on garde le tirage déjà enregistré
+        // cas où 2 joueurs lancent le 1er quiz du jour en même temps, on reprend celui déjà créé
         quiz = await prisma.dailyQuiz.findUnique({ where: { date } })
       }
     }
@@ -264,7 +245,7 @@ export function registerSockets(io, prisma) {
     return (await prisma.score.count({ where: { date, finishedAt: { not: null }, score: { gt: score } } })) + 1
   }
 
-  // --- Admin ---
+  // --- admin ---
 
   function requireAdmin(token) {
     const session = typeof token === 'string' ? adminTokens.get(token) : null
@@ -286,7 +267,7 @@ export function registerSockets(io, prisma) {
     return (typeof forwarded === 'string' && forwarded.split(',')[0].trim()) || socket.handshake.address
   }
 
-  // --- Parties perso ---
+  // --- parties perso ---
 
   function newRoomCode() {
     let code
@@ -332,7 +313,6 @@ export function registerSockets(io, prisma) {
     room.timer = setTimeout(() => nextRoomQuestion(room), room.durationMs + GRACE_MS)
   }
 
-  // Si tous les joueurs encore là ont répondu, on n'attend pas la fin du chrono
   function advanceIfAllAnswered(room) {
     if (room.status !== 'playing' || room.advancing) return
     const players = connectedPlayers(room)
@@ -360,7 +340,6 @@ export function registerSockets(io, prisma) {
     closeRoom(room)
   }
 
-  // Le joueur quitte sa partie (déconnexion, ou il en crée / rejoint une autre)
   function leaveRoom(socket) {
     const current = socket.data.room
     socket.data.room = null
@@ -369,7 +348,6 @@ export function registerSockets(io, prisma) {
     if (!room) return
     socket.leave(channel(room))
     if (current.playerId === room.creatorId) {
-      // Le créateur part : la partie s'arrête pour tout le monde
       socket.to(channel(room)).emit('room:closed')
       return closeRoom(room)
     }
@@ -393,12 +371,11 @@ export function registerSockets(io, prisma) {
     return { room, player }
   }
 
-  // --- Événements ---
+  // --- événements socket ---
 
   io.on('connection', (socket) => {
     const mySessions = new Set()
 
-    // Enregistre un événement avec accusé de réception et gestion d'erreur commune
     function handle(event, fn) {
       socket.on(event, async (payload, ack) => {
         const reply = typeof ack === 'function' ? ack : () => {}
@@ -413,7 +390,7 @@ export function registerSockets(io, prisma) {
       })
     }
 
-    // --- Accueil ---
+    // --- accueil ---
 
     handle('themes:list', async () => {
       const labels = await prisma.label.findMany({
@@ -454,14 +431,14 @@ export function registerSockets(io, prisma) {
       return { date: day, entries }
     })
 
-    // --- Solo : quiz du jour et quiz à thème ---
+    // --- solo (quiz du jour + quiz à thème) ---
 
     handle('solo:start', async ({ mode, themeId, nickname }) => {
       const name = cleanNickname(nickname)
       const date = today()
       let questions
       if (mode === 'daily') {
-        // On réserve la place au classement dès le départ : pas de deuxième essai en rechargeant la page
+        // on crée le score dès le début, comme ça pas de 2e essai en rechargeant la page
         try {
           await prisma.score.create({ data: { nickname: name, date } })
         } catch {
@@ -493,7 +470,7 @@ export function registerSockets(io, prisma) {
       if (s.final) return s.final
       const total = s.questions.length
 
-      // Question déjà affichée et pas encore répondue : on la renvoie avec le temps restant
+      // si la question a déjà été envoyée sans réponse, on la renvoie avec le temps qui reste
       if (s.waiting) {
         const left = Math.max(0, SOLO_DURATION_MS - (Date.now() - s.shownAt))
         return { done: false, question: publicQuestion(s.questions[s.index], s.index, total, left) }
@@ -506,7 +483,6 @@ export function registerSockets(io, prisma) {
         return { done: false, question: publicQuestion(s.questions[s.index], s.index, total, SOLO_DURATION_MS) }
       }
 
-      // Fin du quiz
       const score = totalScore(s.answers)
       let rank = null
       if (s.mode === 'daily') {
@@ -529,7 +505,7 @@ export function registerSockets(io, prisma) {
       return {}
     })
 
-    // --- Parties perso ---
+    // --- parties perso ---
 
     handle('room:create', async ({ nickname, themeId, questionCount, durationSec }) => {
       const name = cleanNickname(nickname)
@@ -584,7 +560,7 @@ export function registerSockets(io, prisma) {
       if (room.status !== 'lobby') fail('GAME_STARTED')
       room.status = 'starting'
       const questions = await randomQuestions(room.settings.questionCount, room.settings.themeId)
-      if (!rooms.has(room.code)) fail('ROOM_NOT_FOUND') // le créateur est parti pendant le tirage
+      if (!rooms.has(room.code)) fail('ROOM_NOT_FOUND') // le créateur a quitté pendant le tirage
       if (!questions.length) {
         room.status = 'lobby'
         fail('NO_QUESTIONS')
@@ -608,7 +584,7 @@ export function registerSockets(io, prisma) {
       return {}
     })
 
-    // --- Propositions de questions ---
+    // --- propositions de questions ---
 
     async function hasProposedToday(nickname, date) {
       return (await prisma.proposal.count({ where: { nickname, date } })) > 0
@@ -650,7 +626,7 @@ export function registerSockets(io, prisma) {
       }
     })
 
-    // --- Admin ---
+    // --- admin ---
 
     handle('admin:login', async ({ name, password }) => {
       const ip = clientIp(socket)
@@ -659,7 +635,7 @@ export function registerSockets(io, prisma) {
       if ((loginFailures.get(ip)?.count ?? 0) >= LOGIN_MAX_FAILURES) fail('TOO_MANY_ATTEMPTS')
 
       const expected = typeof name === 'string' ? admins.get(name.trim()) : undefined
-      // On compare même si le compte n'existe pas, pour ne pas révéler les identifiants valides
+      // on compare même si le compte existe pas, sinon on pourrait deviner les identifiants valides
       const valid = sameSecret(password ?? '', expected ?? randomId()) && expected !== undefined
       if (!valid) {
         const f = loginFailures.get(ip) ?? { count: 0, since: Date.now() }
@@ -708,7 +684,6 @@ export function registerSockets(io, prisma) {
       }
       if (decision !== 'approve') fail('INVALID')
 
-      // L'admin a pu corriger la question : on valide la version corrigée
       const original = {
         type: proposal.type,
         text: proposal.text,

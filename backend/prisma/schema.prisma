@@ -1,9 +1,4 @@
-// Base de données de Quiz Clash.
-// SQLite par défaut (un simple fichier dev.db). Pour PostgreSQL : provider = "postgresql"
-// et DATABASE_URL="postgresql://user:motdepasse@localhost:5432/quizclash" dans .env.
-//
-// Les listes (réponses d'un QCM, réponses acceptées, questions du jour) sont stockées
-// en texte JSON : ça marche à l'identique sur SQLite et PostgreSQL.
+// les listes sont en JSON dans des String, comme ça ça marche en SQLite et en Postgres
 
 generator client {
   provider = "prisma-client-js"
@@ -14,7 +9,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Étiquette de thème ("histoire", "geo"…). isTheme = proposée comme quiz à thème sur l'accueil.
+// isTheme = le label apparait dans les quiz à thème de l'accueil
 model Label {
   id        Int        @id @default(autoincrement())
   slug      String     @unique
@@ -26,49 +21,46 @@ model Label {
 
 model Question {
   id              Int      @id @default(autoincrement())
-  type            String // "choice" (QCM à 4 réponses) | "text" (réponse libre)
+  type            String // "choice" = QCM, "text" = réponse libre
   text            String
-  choices         String? // JSON : ["A", "B", "C", "D"]
-  answerIndex     Int? // QCM : index de la bonne réponse (0-3)
-  acceptedAnswers String? // JSON : ["Napoléon", "Bonaparte"]
+  choices         String? // les 4 réponses en JSON
+  answerIndex     Int? // index de la bonne réponse, de 0 à 3
+  acceptedAnswers String? // ex : ["Napoléon", "Bonaparte"]
   labels          Label[]
   createdAt       DateTime @default(now())
 }
 
-// Les 10 questions du quiz du jour, tirées une fois pour toute la journée
 model DailyQuiz {
-  date        String @id // "2026-10-22" (fuseau Europe/Paris)
-  questionIds String // JSON : [12, 4, 57, …]
+  date        String @id // genre "2026-10-22", heure de Paris
+  questionIds String // ids des 10 questions du jour
 }
 
-// Score du quiz du jour : une ligne par pseudo et par jour
 model Score {
   id         Int       @id @default(autoincrement())
   nickname   String
   date       String
   score      Int       @default(0)
   createdAt  DateTime  @default(now())
-  finishedAt DateTime? // vide tant que le quiz n'est pas terminé
+  finishedAt DateTime?
 
   @@unique([nickname, date])
   @@index([date, score])
 }
 
-// Question proposée par un joueur, relue par un admin
 model Proposal {
   id              Int       @id @default(autoincrement())
   nickname        String
-  date            String // jour de la proposition (limite : une par jour)
+  date            String
   type            String
   text            String
   choices         String?
   answerIndex     Int?
   acceptedAnswers String?
   labels          Label[]
-  status          String    @default("pending") // "pending" | "approved" | "rejected"
+  status          String    @default("pending") // pending, approved ou rejected
   rejectReason    String?
   reviewedBy      String?
-  questionId      Int? // question créée à la validation
+  questionId      Int?
   createdAt       DateTime  @default(now())
   reviewedAt      DateTime?
 

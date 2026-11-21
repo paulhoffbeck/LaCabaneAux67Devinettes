@@ -7,15 +7,11 @@ import ProposeView from './views/ProposeView.vue'
 import AdminView from './views/AdminView.vue'
 import ScoreBoard from './components/ScoreBoard.vue'
 
-// Pas de routeur : l'écran affiché dépend de cette variable.
-// home = accueil, room = partie perso (réglages et salle d'attente), game = écran de jeu,
-// propose = proposer une question, admin = espace admin
 const screen = ref('home')
-const game = ref(null) // { mode, themeId?, themeName?, roomCode?, playerId?, firstQuestion? }
+const game = ref(null)
 const joinCode = ref('')
-const roomJoinCode = ref('') // code passé à HostView : vide = création
+const roomJoinCode = ref('')
 
-// Le pseudo est gardé dans le navigateur pour ne pas le retaper
 const NICKNAME_KEY = 'quiz-clash:nickname'
 function readNickname() {
   try {
@@ -29,13 +25,11 @@ const cleanNickname = computed(() => nickname.value.trim())
 function saveNickname() {
   try {
     localStorage.setItem(NICKNAME_KEY, cleanNickname.value)
-  } catch {
-    // stockage indisponible (navigation privée) : on garde le pseudo en mémoire
-  }
+  } catch {}
 }
 
 const themes = ref([])
-const daily = ref(null) // { date, played, score? }
+const daily = ref(null)
 const leaderboard = ref([])
 const error = ref('')
 
@@ -91,7 +85,6 @@ function joinRoom() {
   screen.value = 'room'
 }
 
-// La salle d'attente a reçu la première question : on passe à l'écran de jeu
 function roomStarted({ roomCode, playerId, firstQuestion }) {
   game.value = { mode: 'room', roomCode, playerId, firstQuestion }
   screen.value = 'game'
@@ -100,7 +93,6 @@ function roomStarted({ roomCode, playerId, firstQuestion }) {
 function backHome() {
   screen.value = 'home'
   game.value = null
-  // Les thèmes peuvent avoir changé (question validée par un admin)
   loadHome()
 }
 
@@ -116,7 +108,6 @@ onMounted(loadHome)
       <span v-if="cleanNickname && screen !== 'home'" class="who">{{ cleanNickname }}</span>
     </header>
 
-    <!-- Accueil -->
     <main v-if="screen === 'home'" class="home">
       <section class="intro">
         <h1>Chaque jour, dix questions pour tester ta culture générale.</h1>
@@ -210,13 +201,10 @@ onMounted(loadHome)
       </footer>
     </main>
 
-    <!-- Proposer une question -->
     <ProposeView v-else-if="screen === 'propose'" :nickname="cleanNickname" @exit="backHome" />
 
-    <!-- Espace admin -->
     <AdminView v-else-if="screen === 'admin'" @exit="backHome" />
 
-    <!-- Partie perso : réglages et salle d'attente -->
     <HostView
       v-else-if="screen === 'room'"
       :nickname="cleanNickname"
@@ -226,7 +214,6 @@ onMounted(loadHome)
       @exit="backHome"
     />
 
-    <!-- Écran de jeu -->
     <PlayerView
       v-else-if="screen === 'game'"
       :mode="game.mode"
@@ -242,7 +229,6 @@ onMounted(loadHome)
 </template>
 
 <style>
-/* Palette « plateau de culture générale » : encre bleu nuit sur papier clair, or pour les points */
 :root {
   --paper: #f4f5f9;
   --card: #ffffff;

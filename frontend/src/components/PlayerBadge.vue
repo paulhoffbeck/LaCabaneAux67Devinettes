@@ -2,11 +2,10 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  player: { type: Object, required: true }, // { nickname, color? }
-  size: { type: String, default: 'md' }, // 'sm' | 'md'
+  player: { type: Object, required: true },
+  size: { type: String, default: 'md' },
 })
 
-// Sans couleur fournie par le serveur, on en déduit une du pseudo (toujours la même)
 const PALETTE = ['#2f5d8a', '#8a4f7d', '#2b8a6e', '#b5651d', '#5a5fb0', '#9a3b3b', '#3f7f3f', '#7a6a2f']
 const color = computed(() => {
   if (props.player.color) return props.player.color

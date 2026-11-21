@@ -3,12 +3,10 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { roomCreate, roomJoin, roomStart, on } from '../services/socketClient.js'
 import PlayerBadge from '../components/PlayerBadge.vue'
 
-// Partie perso : réglages (créateur), code à partager et salle d'attente (tout le monde).
-// Dès que la première question arrive, on passe la main à l'écran de jeu.
 const props = defineProps({
   nickname: { type: String, required: true },
   themes: { type: Array, default: () => [] },
-  joinCode: { type: String, default: '' }, // rempli = on rejoint une partie existante
+  joinCode: { type: String, default: '' },
 })
 const emit = defineEmits(['started', 'exit'])
 
@@ -20,7 +18,6 @@ const ERRORS = {
   TIMEOUT: 'Le serveur ne répond pas.',
 }
 
-// settings → lobby | joining → lobby | error | closed
 const phase = ref(props.joinCode ? 'joining' : 'settings')
 const error = ref('')
 const settings = ref({ themeId: '', questionCount: 10, durationSec: 20 })
@@ -104,7 +101,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
       <span></span>
     </header>
 
-    <!-- Réglages du créateur -->
     <form v-if="phase === 'settings'" class="card" @submit.prevent="create">
       <h1>Créer une partie</h1>
       <label class="field" for="room-theme">
@@ -131,7 +127,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
       <button class="btn primary" type="submit">Créer la partie</button>
     </form>
 
-    <!-- Salle d'attente -->
     <section v-else-if="phase === 'lobby'" class="lobby">
       <div class="card code-card">
         <p class="eyebrow">Code de la partie</p>

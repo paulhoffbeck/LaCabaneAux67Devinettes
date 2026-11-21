@@ -5,11 +5,10 @@ import ScoreBoard from '../components/ScoreBoard.vue'
 import '../web-components/TimerGauge.js'
 
 const props = defineProps({
-  mode: { type: String, required: true }, // 'daily' | 'theme' | 'room'
+  mode: { type: String, required: true },
   themeId: { type: [String, Number], default: null },
   themeName: { type: String, default: null },
   nickname: { type: String, required: true },
-  // Partie perso : la salle d'attente (HostView) nous passe la room et la première question
   roomCode: { type: String, default: '' },
   playerId: { type: String, default: '' },
   firstQuestion: { type: Object, default: null },
@@ -24,17 +23,14 @@ const ERRORS = {
   TIMEOUT: 'Le serveur ne répond pas.',
 }
 
-// Solo : loading → question → sending → loading → … → done | error
-// Partie perso : question → waiting (les autres répondent) → question → … → done
-// La correction n'arrive qu'à la fin, dans le récapitulatif.
 const phase = ref('loading')
 const error = ref('')
 const sessionId = ref(null)
 const question = ref(null)
 const deadline = ref(0)
-const picked = ref(null) // index (QCM) ou texte saisi
+const picked = ref(null)
 const typed = ref('')
-const final = ref(null) // { score, rank?, recap: [...] }
+const final = ref(null)
 const textInput = ref(null)
 const isRoom = props.mode === 'room'
 const answered = ref({ answeredCount: 0, playerCount: 0 })
@@ -85,7 +81,6 @@ async function answer(value) {
   phase.value = 'sending'
   try {
     if (isRoom) {
-      // En partie perso, c'est le serveur qui envoie la question suivante
       phase.value = 'waiting'
       await roomAnswer(props.roomCode, question.value.questionId, value)
       return
@@ -103,8 +98,6 @@ function submitText() {
   if (value) answer(value)
 }
 
-// Temps écoulé : en solo on envoie « pas de réponse » (0 point) et on passe à la suite ;
-// en partie perso on attend simplement la question suivante du serveur.
 function onTimeout() {
   if (phase.value !== 'question') return
   if (isRoom) phase.value = 'waiting'
@@ -112,7 +105,6 @@ function onTimeout() {
 }
 
 const unsubscribers = []
-
 
 onMounted(async () => {
   if (isRoom) {
@@ -158,7 +150,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
       </span>
     </header>
 
-    <!-- Question : on valide et on enchaîne, sans correction -->
     <section v-if="question && ['question', 'sending', 'waiting'].includes(phase)" class="play">
       <div class="progress" aria-hidden="true">
         <span
@@ -184,7 +175,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
 
       <h1 class="question">{{ question.text }}</h1>
 
-      <!-- QCM -->
       <div v-if="question.type === 'choice'" class="choices">
         <button
           v-for="(choice, i) in question.choices"
@@ -200,7 +190,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
         </button>
       </div>
 
-      <!-- Réponse libre -->
       <form v-else class="free" @submit.prevent="submitText">
         <input
           ref="textInput"
@@ -222,7 +211,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
       </p>
     </section>
 
-    <!-- Fin de partie : score puis correction complète -->
     <section v-else-if="phase === 'done'" class="end">
       <div class="summary">
         <p class="eyebrow">{{ isRoom ? 'Partie terminée' : `${title} terminé` }}</p>
@@ -421,11 +409,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
   background: var(--accent-soft);
 }
 
-
-
-
-
-
 .free {
   display: flex;
   gap: 0.6rem;
@@ -443,15 +426,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
   background: var(--card);
   color: var(--ink);
 }
-
-
-
-
-
-
-
-
-
 
 .center {
   min-height: 50vh;
@@ -639,7 +613,6 @@ onUnmounted(() => unsubscribers.forEach((off) => off()))
   font-size: 1.5rem;
   color: var(--gold);
 }
-
 
 .err {
   color: var(--bad);

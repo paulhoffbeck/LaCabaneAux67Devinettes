@@ -1,11 +1,9 @@
-// API HTTP classique. Le jeu passe entièrement par socket.io (sockets.js) :
-// ici, seulement de quoi vérifier que le serveur et la base répondent.
 import { Router } from 'express'
 
 export function createRoutes(prisma) {
   const router = Router()
 
-  // GET /api/health → { ok: true, questions: 84 }
+  // juste pour checker que le serveur et la bdd marchent
   router.get('/health', async (req, res) => {
     try {
       const questions = await prisma.question.count()

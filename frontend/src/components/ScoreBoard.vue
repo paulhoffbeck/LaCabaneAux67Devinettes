@@ -3,9 +3,9 @@ import { computed } from 'vue'
 import PlayerBadge from './PlayerBadge.vue'
 
 const props = defineProps({
-  leaderboard: { type: Array, required: true }, // [{ id?, nickname, score, rank? }]
+  leaderboard: { type: Array, required: true },
   limit: { type: Number, default: 10 },
-  highlight: { type: String, default: '' }, // pseudo ou id à mettre en évidence
+  highlight: { type: String, default: '' },
 })
 
 const rows = computed(() =>

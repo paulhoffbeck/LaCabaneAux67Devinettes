@@ -1,4 +1,3 @@
-// Point d'entrée : lance Express (site + API) et le serveur WebSocket (socket.io).
 import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -13,8 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const BACKEND_DIR = path.join(__dirname, '..')
 
 const PORT = Number(process.env.PORT ?? 3000)
-// En dev, 0.0.0.0 pour que les téléphones du réseau local puissent se connecter.
-// En production derrière nginx, mettre HOST=127.0.0.1 dans .env.
+// si on passe par nginx, mettre HOST=127.0.0.1 dans le .env
 const HOST = process.env.HOST ?? '0.0.0.0'
 const IS_PROD = process.env.NODE_ENV === 'production'
 const FRONT_DIST = path.resolve(BACKEND_DIR, process.env.FRONT_DIST ?? '../frontend/dist')
@@ -22,8 +20,7 @@ const QUESTIONS_FILE = path.resolve(BACKEND_DIR, process.env.QUESTIONS_FILE ?? '
 
 const prisma = new PrismaClient()
 
-// Au premier démarrage (base vide), on importe la banque de questions depuis questions.json :
-// { labels: [{ slug, name, isTheme }], questions: [{ type, labels: [slug], text, choices?, answerIndex?, acceptedAnswers? }] }
+// au premier lancement la base est vide, on la remplit avec questions.json
 async function importQuestionsIfEmpty() {
   if ((await prisma.question.count()) > 0) return
   if (!fs.existsSync(QUESTIONS_FILE)) {
@@ -58,8 +55,7 @@ async function importQuestionsIfEmpty() {
 const app = express()
 const server = http.createServer(app)
 const io = new Server(server, {
-  // En dev, le front tourne sur un autre port (Vite, 5173) : on l'autorise.
-  // En production, le front est servi ici même : même origine, pas besoin de CORS.
+  // en dev le front tourne sur Vite (autre port) donc faut autoriser le cors
   cors: IS_PROD ? undefined : { origin: true },
 })
 
@@ -67,7 +63,6 @@ app.disable('x-powered-by')
 app.use(express.json())
 app.use('/api', createRoutes(prisma))
 
-// Le front compilé (npm run build dans frontend/)
 if (fs.existsSync(FRONT_DIST)) {
   app.use(express.static(FRONT_DIST))
 } else {
@@ -81,7 +76,6 @@ server.listen(PORT, HOST, () => {
   console.log(`Quiz Clash en écoute sur http://${HOST}:${PORT}`)
 })
 
-// Arrêt propre (systemctl stop / Ctrl+C)
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, async () => {
     io.close()

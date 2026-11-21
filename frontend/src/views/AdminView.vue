@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue'
 import { adminLogin, adminPending, adminReview, listLabels } from '../services/socketClient.js'
 
-// Espace admin : relire les questions proposées, les corriger, puis les valider ou les refuser.
 const emit = defineEmits(['exit'])
 
 const LETTERS = ['A', 'B', 'C', 'D']
@@ -14,7 +13,6 @@ const FIELD_ERRORS = {
   labelIds: 'Il faut au moins un thème.',
 }
 
-// Le jeton ne vit que le temps de l'onglet
 const TOKEN_KEY = 'quiz-clash:admin-token'
 function readToken() {
   try {
@@ -27,9 +25,7 @@ function saveToken(value) {
   try {
     if (value) sessionStorage.setItem(TOKEN_KEY, value)
     else sessionStorage.removeItem(TOKEN_KEY)
-  } catch {
-    // stockage indisponible : on garde le jeton en mémoire
-  }
+  } catch {}
 }
 
 const token = ref(readToken())
@@ -37,11 +33,10 @@ const name = ref('')
 const password = ref('')
 const loginError = ref('')
 const labels = ref([])
-const items = ref([]) // propositions en attente, chacune avec son brouillon modifiable
+const items = ref([])
 const notice = ref('')
 const loading = ref(false)
 
-// Brouillon éditable : on ne touche pas à l'original tant que l'admin n'a pas validé
 function toDraft(p) {
   return {
     original: p,
@@ -101,7 +96,6 @@ function toggleLabel(item, id) {
   item.draft.labelIds = ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
 }
 
-// Les champs modifiés par l'admin, envoyés avec la validation
 function editsOf(item) {
   const { original: p, draft: d } = item
   const edits = { text: d.text.trim(), labelIds: d.labelIds }
@@ -139,7 +133,6 @@ onMounted(() => {
       <span v-else></span>
     </header>
 
-    <!-- Connexion -->
     <form v-if="!token" class="card login" @submit.prevent="login">
       <h1>Connexion admin</h1>
       <label class="field" for="a-name">
@@ -154,7 +147,6 @@ onMounted(() => {
       <button class="btn primary" type="submit" :disabled="!name.trim() || !password">Se connecter</button>
     </form>
 
-    <!-- Propositions en attente -->
     <template v-else>
       <div class="head">
         <h1>{{ items.length }} proposition{{ items.length > 1 ? 's' : '' }} en attente</h1>

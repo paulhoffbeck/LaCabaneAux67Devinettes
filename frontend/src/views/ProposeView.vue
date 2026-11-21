@@ -2,8 +2,6 @@
 import { ref, watch, onMounted } from 'vue'
 import { listLabels, proposalQuota, submitProposal, myProposals } from '../services/socketClient.js'
 
-// Un joueur propose une question ; un admin la validera, la corrigera ou la refusera.
-// Le serveur limite à une proposition par jour.
 const props = defineProps({
   nickname: { type: String, required: true },
 })
@@ -21,7 +19,7 @@ const FIELD_ERRORS = {
 const STATUS = { pending: 'En attente', approved: 'Validée', rejected: 'Refusée' }
 
 const labels = ref([])
-const quota = ref(null) // { canPropose, nextAt? }
+const quota = ref(null)
 const mine = ref([])
 const error = ref('')
 const sent = ref(false)
@@ -29,8 +27,6 @@ const sending = ref(false)
 
 const form = ref({ type: 'choice', text: '', choices: ['', '', '', ''], answerIndex: null, acceptedAnswers: [''], labelIds: [] })
 
-
-// Même règles que le serveur, pour prévenir avant l'envoi
 function check(f) {
   const text = f.text.trim()
   if (text.length < 10 || text.length > 200) return 'text'
@@ -43,7 +39,6 @@ function check(f) {
   return null
 }
 
-// Le message d'erreur disparaît dès que le joueur corrige le formulaire
 watch(form, () => (error.value = ''), { deep: true })
 
 function toggleLabel(id) {
@@ -113,19 +108,16 @@ onMounted(async () => {
       <span></span>
     </header>
 
-    <!-- Envoyée -->
     <section v-if="sent" class="card done">
       <h1>Merci {{ nickname }} !</h1>
       <p class="muted">Ta question est en attente de validation par un admin. Tu peux suivre son statut ci-dessous.</p>
     </section>
 
-    <!-- Limite atteinte -->
     <section v-else-if="quota && !quota.canPropose" class="card done">
       <h1>Une question par jour</h1>
       <p class="muted">Tu as déjà proposé une question aujourd'hui. Tu pourras en proposer une autre demain.</p>
     </section>
 
-    <!-- Formulaire -->
     <form v-else-if="quota" class="card" @submit.prevent="submit">
       <p class="muted">Une proposition par jour. Un admin la relit avant qu'elle n'entre dans les quiz.</p>
 
@@ -195,7 +187,6 @@ onMounted(async () => {
 
     <p v-else-if="error" class="err">{{ error }}</p>
 
-    <!-- Suivi -->
     <section v-if="mine.length" class="card">
       <h2>Mes propositions</h2>
       <ul class="mine">
